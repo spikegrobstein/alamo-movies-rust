@@ -20,8 +20,8 @@ impl Cinema {
     pub fn name(&self) -> Result<String, Box<dyn Error>> {
         let field = self.data["CinemaName"];
 
-        let s = &field.as_str()?;
+        let s = field.as_str()?;
 
-        Ok(s)
+        Ok(s.to_string())
     }
 }
