@@ -7,10 +7,10 @@ use std::process::exit;
 use std::path::PathBuf;
 use std::fs;
 use std::error::Error;
+
 use chrono::{DateTime, Utc};
-
-
 use clap::{ArgMatches};
+use rayon::prelude::*;
 
 pub fn subcommand_films(matches: &ArgMatches) {
     let cinema_id = matches.value_of("cinema_id").unwrap();
@@ -197,8 +197,21 @@ fn print_cinema_list(matches: &ArgMatches) {
             return;
         }
 
-        for cinema_id in db::list_cinema_ids(db_path) {
-            let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
+        let cinema_ids = db::list_cinema_ids(db_path);
+
+        let mut cinemas: Vec<Cinema> =
+            cinema_ids
+                .par_iter()
+                .map(|cinema_id| {
+                    let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
+
+                    cinema
+                })
+                .collect();
+
+        cinemas.sort_by(|a, b| a.id.cmp(&b.id));
+
+        for cinema in cinemas.iter() {
             print_cinema_info(&cinema);
         }
     } else {
