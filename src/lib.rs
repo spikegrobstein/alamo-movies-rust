@@ -1,1 +1,1 @@
-pub use self::alamo_movies;
+pub mod alamo_movies;
