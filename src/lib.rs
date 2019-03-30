@@ -2,3 +2,4 @@
 extern crate regex;
 
 pub mod alamo_movies;
+pub use alamo_movies::*;
