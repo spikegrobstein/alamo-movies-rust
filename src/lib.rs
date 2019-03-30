@@ -1,1 +1,1 @@
-pub use self;
+pub use self::alamo_movies::*;
