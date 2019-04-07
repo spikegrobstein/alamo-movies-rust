@@ -5,7 +5,7 @@ use super::film_title::FilmTitle;
 
 use serde::{Serialize};
 
-#[derive(Clone, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Film {
     pub id: String,
     pub name: String,
