@@ -402,7 +402,7 @@ impl Cinema {
         ))
     }
 
-    pub fn get_calendar_data(cinema_id: &str) -> Result<String, Box<Error>>  {
+    pub fn get_calendar_data(cinema_id: &str) -> Result<String, Box<dyn Error>>  {
         let url: &str = &format!("https://feeds.drafthouse.com/adcService/showtimes.svc/calendar/{}/", cinema_id);
 
         let body = reqwest::get(url)?
