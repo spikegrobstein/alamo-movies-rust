@@ -92,6 +92,12 @@ mod tests {
         }
     }
 
+    #[test]
+    fn parses_movie_title_with_4k() {
+        let film_title = FilmTitle::parse("BLACK SAMURAI - 4K").unwrap();
+        assert_eq!(film_title.title, "BLACK SAMURAI");
+    }
+
 }
 
 pub struct FilmTitle {
@@ -104,6 +110,8 @@ impl FilmTitle {
     pub fn parse(title: &str) -> Option<FilmTitle> {
         lazy_static! {
              static ref RE: Regex =
+                //                  show type            2d/3d         title            suffix
+                //             v                   v v             v v        vv                           v
                  Regex::new(r"^(?:([^:]+[a-z]+):\s+)?(?:2D\s+|3D\s+)?([^a-z]+)(?:\s+(.*[a-z].*))?$")
                      .unwrap();
         }
@@ -111,11 +119,17 @@ impl FilmTitle {
         // eprintln!("[DEBUG] Parsing: {}", name);
 
         match RE.captures(title) {
-            None => Some(FilmTitle {
-                title: String::from(title),
-                show_type: String::from(""),
-                suffix: String::from(""),
-            }), // no match, so return nothing.
+            None => {
+                // remove a trailing 4K from the title.
+                // this happens sometimes and is completely extraneous
+                let title = title.replace(" - 4K", "");
+
+                Some(FilmTitle {
+                    title: String::from(title),
+                    show_type: String::from(""),
+                    suffix: String::from(""),
+                })
+            }, // no match, so return nothing.
             Some(cap) => {
                 //eprintln!("captures: {:?}", cap);
                 // 1 - type
@@ -125,6 +139,10 @@ impl FilmTitle {
                 let show_type = String::from(cap.get(1).map_or("", |c| c.as_str()));
                 let title = String::from(cap.get(2).map_or("", |c| c.as_str()));
                 let suffix = String::from(cap.get(3).map_or("", |c| c.as_str()));
+
+                // remove a trailing 4K from the title.
+                // this happens sometimes and is completely extraneous
+                let title = title.replace(" - 4K", "");
 
                 Some(FilmTitle {
                     title,
