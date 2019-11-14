@@ -19,7 +19,18 @@ mod tests {
     fn parse_title_with_year() {
         if let Some(film_title) = FilmTitle::parse("US (2009)") {
             assert_eq!(film_title.show_type, "");
-            assert_eq!(film_title.title , "US (2009)");
+            assert_eq!(film_title.title , "US");
+            assert_eq!(film_title.suffix, "");
+        } else {
+            panic!("Fail!");
+        }
+    }
+
+    #[test]
+    fn parse_title_with_type_and_year() {
+        if let Some(film_title) = FilmTitle::parse("Weird Wednesday: US (2009)") {
+            assert_eq!(film_title.show_type, "Weird Wednesday");
+            assert_eq!(film_title.title , "US");
             assert_eq!(film_title.suffix, "");
         } else {
             panic!("Fail!");
@@ -114,6 +125,10 @@ impl FilmTitle {
                 //             v                   v v             v v        vv                           v
                  Regex::new(r"^(?:([^:]+[a-z]+):\s+)?(?:2D\s+|3D\s+)?([^a-z]+)(?:\s+(.*[a-z].*))?$")
                      .unwrap();
+
+             static ref MOVIE_WITH_YEAR_RE: Regex =
+                 Regex::new(r"\s+\(\d{4}\)$")
+                     .unwrap();
         }
 
         // eprintln!("[DEBUG] Parsing: {}", name);
@@ -123,6 +138,7 @@ impl FilmTitle {
                 // remove a trailing 4K from the title.
                 // this happens sometimes and is completely extraneous
                 let title = title.replace(" - 4K", "");
+                let title = MOVIE_WITH_YEAR_RE.replace_all(&title, "");
 
                 Some(FilmTitle {
                     title: String::from(title),
@@ -143,6 +159,7 @@ impl FilmTitle {
                 // remove a trailing 4K from the title.
                 // this happens sometimes and is completely extraneous
                 let title = title.replace(" - 4K", "");
+                let title = MOVIE_WITH_YEAR_RE.replace_all(&title, "").to_string();
 
                 Some(FilmTitle {
                     title,
