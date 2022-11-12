@@ -26,7 +26,7 @@ impl error::Error for InvalidCinemaFile {
         "cinema id does not point to a valid cinema"
     }
 
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         // Generic error, underlying cause isn't tracked.
         None
     }
@@ -47,7 +47,7 @@ impl error::Error for InvalidCinemaData {
         "data does not represent a valid cinema and films"
     }
 
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         // Generic error, underlying cause isn't tracked.
         None
     }
@@ -78,7 +78,7 @@ impl error::Error for NoCalendarFile {
         "file does not exist"
     }
 
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         // Generic error, underlying cause isn't tracked.
         None
     }
@@ -109,7 +109,7 @@ impl error::Error for ExpiredCalendarFile {
         "calendar data is expired"
     }
 
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         // Generic error, underlying cause isn't tracked.
         None
     }
@@ -130,7 +130,7 @@ impl error::Error for NoLocalCinemaData {
         "no local cinema data"
     }
 
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         // Generic error, underlying cause isn't tracked.
         None
     }

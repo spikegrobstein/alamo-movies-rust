@@ -97,7 +97,7 @@ pub fn write_calendar_file(cinema_id: &str, data: &str) -> Result<(), Box<dyn Er
     let filepath = calendar_path_for_cinema_id(cinema_id);
     let mut file = fs::File::create(filepath)?;
 
-    let result = file.write_all(data.as_bytes())?;
+    file.write_all(data.as_bytes())?;
 
-    Ok(result)
+    Ok(())
 }

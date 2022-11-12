@@ -34,7 +34,7 @@ impl Film {
             runtime: runtime.to_string(),
             slug: slug.to_string(),
             show_type: film_title.show_type.to_string(),
-            suffix: film_title.suffix.to_string(),
+            suffix: film_title.suffix,
         })
     }
 

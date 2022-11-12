@@ -15,14 +15,16 @@ use rayon::prelude::*;
 
 pub fn subcommand_films(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let cinema_id = matches.value_of("cinema_id").unwrap();
-    let cinema_id = Cinema::to_cinema_id(cinema_id).unwrap();
+    // let cinema_id = Cinema::to_cinema_id(cinema_id).unwrap();
 
+    println!("Getting cinema id {cinema_id}");
     let format = format_for_match(matches);
 
     let films = if let Some(film_type) = matches.value_of("type") {
-        filtered_films_for(&cinema_id, film_type)?
+        filtered_films_for(cinema_id, film_type)?
     } else {
-        films_for(&cinema_id)?
+        println!("getting films...");
+        films_for(cinema_id)?
     };
 
     printer::list_films(&films, &format);
@@ -37,7 +39,7 @@ pub fn subcommand_cinema(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         Some(cinema_id) => {
             // the user passed a cinema ID
             // so find that cinema and print it.
-            let cinema_id = Cinema::to_cinema_id(&cinema_id).unwrap();
+            let cinema_id = Cinema::to_cinema_id(cinema_id).unwrap();
             let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id)?;
 
             printer::cinema_info(&cinema, &format);
@@ -112,7 +114,9 @@ fn format_for_match(matches: &ArgMatches) -> Format {
 fn load_or_sync_cinema_for_id(cinema_id: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
     let path = db::calendar_path_for_cinema_id(cinema_id);
 
-    if let Err(_) = check_local_file(&path) {
+    println!("reading from file {:?}", path);
+
+    if check_local_file(&path).is_err() {
         match Cinema::sync_file(cinema_id) {
             Err(error) => {
                 eprintln!("Failed to download cinema data for cinema with ID {}: {}", cinema_id, error);
@@ -123,7 +127,7 @@ fn load_or_sync_cinema_for_id(cinema_id: &str) -> Result<(Cinema, Vec<Film>), Bo
         }
     }
 
-    Ok(Cinema::from_calendar_file(&path)?)
+    Cinema::from_calendar_file(&path)
 }
 
 fn check_local_file(path: &PathBuf) -> Result<(), Box<dyn Error>> {
@@ -188,7 +192,7 @@ fn get_cinema_list(matches: &ArgMatches) -> Result<Vec<Cinema>, Box<dyn Error>> 
             cinema_ids
                 .par_iter()
                 .map(|cinema_id| {
-                    let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to get cinema");
+                    let (cinema, _films) = load_or_sync_cinema_for_id(cinema_id).expect("Failed to get cinema");
                     cinema
                 })
                 .collect();

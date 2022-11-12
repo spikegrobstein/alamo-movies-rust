@@ -1,6 +1,6 @@
 use std::fs;
 use std::error::Error;
-use std::path::PathBuf;
+use std::path::Path;
 
 use reqwest;
 use regex::Regex;
@@ -365,13 +365,10 @@ impl Cinema {
             cinemas.iter()
                 .find(|c| c.slug == cinema_id);
         
-        match cinema_id {
-            Some(c) => Some(c.id.clone()),
-            None => None,
-        }
+        cinema_id.map(|c| c.id.clone())
     }
 
-    pub fn from_calendar_file(path: &PathBuf) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
+    pub fn from_calendar_file(path: &Path) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
         let contents = fs::read_to_string(path.to_str().unwrap())?;
         Cinema::from_calendar_data(&contents)
     }
@@ -402,10 +399,12 @@ impl Cinema {
         ))
     }
 
-    pub fn get_calendar_data(cinema_id: &str) -> Result<String, Box<Error>>  {
-        let url: &str = &format!("https://feeds.drafthouse.com/adcService/showtimes.svc/calendar/{}/", cinema_id);
+    pub fn get_calendar_data(cinema_id: &str) -> Result<String, Box<dyn Error>>  {
+        let url = format!("https://drafthouse.com/s/mother/v2/schedule/market/{cinema_id}");
 
-        let body = reqwest::get(url)?
+        println!("requesting file...");
+
+        let body = reqwest::get(&url)?
             .text()?;
 
         Ok(body)
