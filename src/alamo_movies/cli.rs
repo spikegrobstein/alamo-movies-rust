@@ -5,6 +5,8 @@ use super::error::{NoLocalCinemaData, NoCalendarFile, ExpiredCalendarFile};
 use super::printer;
 use super::printer::Format;
 
+use crate::alamo_movies::market::Market;
+
 use std::path::PathBuf;
 use std::fs;
 use std::error::Error;
@@ -47,9 +49,9 @@ pub fn subcommand_cinema(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         None => {
             // the user did not pass a cinema ID
             // so print a list of all cinemas (with other args we got)
-            let cinemas = get_cinema_list(matches)?;
+            let markets = get_market_list(matches)?;
 
-            printer::list_cinemas(&cinemas, &format);
+            printer::list_markets(&markets, &format);
         }
     }
 
@@ -112,22 +114,23 @@ fn format_for_match(matches: &ArgMatches) -> Format {
 }
 
 fn load_or_sync_cinema_for_id(cinema_id: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
-    let path = db::calendar_path_for_cinema_id(cinema_id);
+    unimplemented!("not yet implemented");
+    // let path = db::calendar_path_for_cinema_id(cinema_id);
 
-    println!("reading from file {:?}", path);
+    // println!("reading from file {:?}", path);
 
-    if check_local_file(&path).is_err() {
-        match Cinema::sync_file(cinema_id) {
-            Err(error) => {
-                eprintln!("Failed to download cinema data for cinema with ID {}: {}", cinema_id, error);
-                eprintln!("Is this a valid cinema ID?");
-                return Err(error);
-            },
-            _ => eprintln!("Synced file for cinema via API."),
-        }
-    }
+    // if check_local_file(&path).is_err() {
+        // match Cinema::sync_file(cinema_id) {
+            // Err(error) => {
+                // eprintln!("Failed to download cinema data for cinema with ID {}: {}", cinema_id, error);
+                // eprintln!("Is this a valid cinema ID?");
+                // return Err(error);
+            // },
+            // _ => eprintln!("Synced file for cinema via API."),
+        // }
+    // }
 
-    Cinema::from_calendar_file(&path)
+    // Cinema::from_calendar_file(&path)
 }
 
 fn check_local_file(path: &PathBuf) -> Result<(), Box<dyn Error>> {
@@ -178,8 +181,9 @@ fn filtered_films_for(cinema_id: &str, film_type: &str) -> Result<Vec<Film>, Box
         )
 }
 
-fn get_cinema_list(matches: &ArgMatches) -> Result<Vec<Cinema>, Box<dyn Error>> {
+fn get_market_list(matches: &ArgMatches) -> Result<Vec<Market>, Box<dyn Error>> {
     if matches.is_present("local") {
+        unimplemented!("not yet implemented");
         let db_path = db::base_directory_path();
 
         if ! db_path.is_dir() {
@@ -188,21 +192,21 @@ fn get_cinema_list(matches: &ArgMatches) -> Result<Vec<Cinema>, Box<dyn Error>> 
 
         let cinema_ids = db::list_cinema_ids(db_path);
 
-        let mut cinemas: Vec<Cinema> =
-            cinema_ids
-                .par_iter()
-                .map(|cinema_id| {
-                    let (cinema, _films) = load_or_sync_cinema_for_id(cinema_id).expect("Failed to get cinema");
-                    cinema
-                })
-                .collect();
+        // let mut cinemas: Vec<Market> =
+            // cinema_ids
+                // .par_iter()
+                // .map(|cinema_id| {
+                    // let (market, _films) = load_or_sync_cinema_for_id(cinema_id).expect("Failed to get cinema");
+                    // market
+                // })
+                // .collect();
 
-        cinemas.sort_by(|a, b| a.id.cmp(&b.id));
+        // cinemas.sort_by(|a, b| a.id.cmp(&b.id));
 
-        Ok(cinemas)
+        // Ok(cinemas)
     } else {
         // print out the built-in cinema list
-        Ok(Cinema::list().to_vec())
+        Market::list()
     }
 }
 
