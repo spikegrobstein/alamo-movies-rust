@@ -65,20 +65,21 @@ impl Cinema {
     }
 
     pub fn from_calendar_json(json: &serde_json::Value) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
-        let name = cinema_name_from(json).unwrap();
-        let id = cinema_id_from(json).unwrap();
-        let slug = cinema_slug_from(json).unwrap();
+        unimplemented!("not implemented");
+        // let name = cinema_name_from(json).unwrap();
+        // let id = cinema_id_from(json).unwrap();
+        // let slug = cinema_slug_from(json).unwrap();
 
-        let market = Market::from_calendar_json(json)?;
+        // let market = Market::from_calendar_json(json)?;
 
-        Ok((Cinema {
-            id: id.to_string(),
-            name: name.to_string(),
-            slug: slug.to_string(),
-            market,
-            },
-            Film::films_from_calendar(json)?,
-        ))
+        // Ok((Cinema {
+            // id: id.to_string(),
+            // name: name.to_string(),
+            // slug: slug.to_string(),
+            // market,
+            // },
+            // Film::films_from_calendar(json)?,
+        // ))
     }
 
     pub fn get_calendar_data(slug: &str) -> Result<String, Box<dyn Error>>  {

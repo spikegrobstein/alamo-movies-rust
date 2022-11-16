@@ -2,6 +2,7 @@ use super::cinema::Cinema;
 use super::film::Film;
 
 use crate::alamo_movies::market::Market;
+use crate::alamo_movies::presentation::Presentation;
 
 pub enum Format {
     Text,
@@ -9,12 +10,12 @@ pub enum Format {
 }
 
 /// given a vector of films, print them out accordingly
-pub fn list_films(films: &Vec<Film>, format: &Format) {
+pub fn list_films(presentations: &Vec<Presentation>, format: &Format) {
     match format {
-        Format::Json => json_list_films(films),
+        Format::Json => json_list_shows(presentations),
         Format::Text => {
-            for film in films.iter() {
-                film_info(film, format);
+            for pres in presentations.iter() {
+                show_info(pres, format);
             }
         },
     }
@@ -35,8 +36,23 @@ pub fn film_info(film: &Film, _format: &Format) {
     println!("{}", film.name)
 }
 
+pub fn show_info(presentation: &Presentation, _format: &Format) {
+    if let Some(ref show_type) = presentation.primary_collection_slug {
+        println!("{} ({})", presentation.show.title, show_type);
+    } else {
+        println!("{}", presentation.show.title);
+    }
+}
+
 pub fn json_list_films(films: &Vec<Film>) {
     match serde_json::to_string(films) {
+        Ok(json) => println!("{}", json),
+        _ => panic!("whoops"),
+    }
+}
+
+pub fn json_list_shows(shows: &Vec<Presentation>) {
+    match serde_json::to_string(shows) {
         Ok(json) => println!("{}", json),
         _ => panic!("whoops"),
     }

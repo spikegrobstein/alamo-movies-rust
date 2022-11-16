@@ -80,11 +80,8 @@ fn is_calendar_file(path: PathBuf) -> bool {
     RE.is_match(path.to_str().unwrap())
 }
 
-/// Given a cinema ID,
-/// construct a path to a the json file in the db directory
-pub fn calendar_path_for_cinema_id(cinema_id: &str) -> PathBuf {
-    // the db directory is ~/.alamo-movies/db
-    let mut filename = String::from(cinema_id);
+pub fn calendar_path_for_market_slug(slug: &str) -> PathBuf {
+    let mut filename: String = slug.into();
     filename.push_str(".calendar.json");
 
     base_directory_path().join(filename)
@@ -92,9 +89,9 @@ pub fn calendar_path_for_cinema_id(cinema_id: &str) -> PathBuf {
 
 /// given the ID of the cinema and string data (from the web API)
 /// write it to the spot
-pub fn write_calendar_file(cinema_id: &str, data: &str) -> Result<(), Box<dyn Error>> {
+pub fn write_calendar_file(slug: &str, data: &str) -> Result<(), Box<dyn Error>> {
     ensure_base_directory_exists()?;
-    let filepath = calendar_path_for_cinema_id(cinema_id);
+    let filepath = calendar_path_for_market_slug(slug);
     let mut file = fs::File::create(filepath)?;
 
     file.write_all(data.as_bytes())?;
