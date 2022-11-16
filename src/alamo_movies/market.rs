@@ -26,8 +26,8 @@ pub struct MarketListData {
 
 #[derive(Deserialize, Debug)]
 pub struct MarketData {
-    market: Vec<Market>,
-    presentations: Vec<Presentation>,
+    pub market: Vec<Market>,
+    pub presentations: Vec<Presentation>,
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug)]
