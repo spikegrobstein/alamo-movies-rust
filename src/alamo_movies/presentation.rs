@@ -3,7 +3,7 @@ use std::error::Error;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct Presentation {
     pub show: Show,
 

@@ -168,17 +168,18 @@ fn shows_for(slug: &str) -> Result<Vec<Presentation>, Box<dyn Error>> {
 }
 
 fn filtered_films_for(slug: &str, film_type: &str) -> Result<Vec<Presentation>, Box<dyn Error>> {
-    unimplemented!("not implemented");
-    // let (_market, mut shows) = load_or_sync_market_for_slug(slug)?;
+    let (_market, mut presentations) = load_or_sync_market_for_slug(slug)?;
 
-    // // list it out
-    // shows.sort_by(|a,b| a.title.cmp(&b.title));
+    // list it out
+    presentations.sort_by(|a,b| a.show.title.cmp(&b.show.title));
 
-    // Ok(shows.iter()
-        // .filter(|f| f.show_type.to_lowercase() == film_type.to_lowercase() )
-        // .cloned()
-        // .collect()
-        // )
+    Ok(presentations.iter()
+        .filter(|p| {
+            p.primary_collection_slug == Some(film_type.to_lowercase())
+        })
+        .cloned()
+        .collect()
+        )
 }
 
 fn get_market_list(matches: &ArgMatches) -> Result<Vec<Market>, Box<dyn Error>> {
