@@ -3,5 +3,5 @@ mod presentation;
 mod show;
 
 pub use market::{Market, MarketData, MarketListData};
-pub use presentation::Presentation;
+pub use presentation::{Presentation, PresentationData};
 pub use show::Show;

@@ -4,7 +4,7 @@ use reqwest::{
 };
 use url::Url;
 
-use crate::api::{MarketContext, MarketSlug};
+use crate::api::{MarketContext, MarketSlug, PresentationContext, PresentationSlug};
 use crate::Result;
 
 pub const DEFAULT_ENDPOINT: &str = "https://drafthouse.com/s/mother";
@@ -38,5 +38,12 @@ impl Client {
 
     pub fn market(&self, slug: MarketSlug) -> MarketContext<'_, MarketSlug> {
         MarketContext::new_with_slug(self, slug)
+    }
+
+    pub fn presentation(
+        &self,
+        slug: PresentationSlug,
+    ) -> PresentationContext<'_, PresentationSlug> {
+        PresentationContext::new_with_slug(self, slug)
     }
 }

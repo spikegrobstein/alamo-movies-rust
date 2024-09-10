@@ -7,5 +7,11 @@ use crate::model::Show;
 pub struct Presentation {
     pub show: Show,
 
+    /// a slug that identifies the collection such as `terror-tuesday`
     pub primary_collection_slug: Option<String>,
+}
+
+#[derive(Clone, Deserialize, Serialize, Debug)]
+pub struct PresentationData {
+    pub presentation: Presentation,
 }
