@@ -1,7 +1,7 @@
 use reqwest::Method;
 
 use crate::api::PresentationSlug;
-use crate::model::{Presentation, PresentationData, Show};
+use crate::model::{Presentation, PresentationData};
 use crate::{Client, Error, Response, Result, V2ErrorBody};
 
 pub struct PresentationContext<'alamo, P> {
@@ -38,7 +38,15 @@ impl<'alamo> PresentationContext<'alamo, PresentationSlug> {
         if status.is_success() {
             Ok(resp.json::<Response<PresentationData>>()?.data.presentation)
         } else {
-            todo!()
+            let error = resp
+                .json::<V2ErrorBody>()
+                .map_err(|e| Error::HttpError {
+                    status,
+                    body: e.to_string(),
+                })?
+                .error;
+
+            Err(Error::ApiError { status, error })
         }
     }
 }
@@ -49,6 +57,8 @@ mod test {
 
     use httpmock::prelude::*;
     use serde_json::json;
+
+    use reqwest::StatusCode;
 
     #[test]
     fn get_presentation() {
@@ -71,5 +81,45 @@ mod test {
             .unwrap();
 
         assert_eq!(mock.hits(), 1);
+    }
+
+    #[test]
+    fn get_presentation_with_error() {
+        let server = MockServer::start();
+
+        let mock = server.mock(|when, then| {
+            when.method(GET)
+                .path("/v2/schedule/presentation/beetlejuice-beetlejuice");
+
+            then.status(404).json_body(json!({
+                "error": {
+                    "errorcode": {
+                        "category": 101,
+                        "code": 404,
+                        "description": "Resource unavailable"
+                    },
+                    "description": "Missing slug",
+                    "errorType": "com.drafthouse.core.domain.AdcMiscError"
+                }
+            }));
+        });
+
+        let url = server.url("");
+        let client = Client::new(&url).unwrap();
+
+        let err = client
+            .presentation(PresentationSlug::new("beetlejuice-beetlejuice"))
+            .get()
+            .err()
+            .unwrap();
+
+        assert_eq!(mock.hits(), 1);
+        assert!(matches!(
+            err,
+            Error::ApiError {
+                status: StatusCode::NOT_FOUND,
+                ..
+            }
+        ));
     }
 }
